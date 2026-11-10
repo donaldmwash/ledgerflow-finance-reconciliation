@@ -2,7 +2,16 @@ import Papa from "papaparse";
 import type { Transaction } from "../types";
 
 type CsvRow = Record<string, string>;
-const required = ["date", "description", "reference", "amount"];
+const required = ["date", "description", "amount"];
+
+function isValidDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const [year, month, day] = value.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day;
+}
 
 export function parseTransactions(file: File): Promise<Transaction[]> {
   return new Promise((resolve, reject) => {
@@ -23,10 +32,11 @@ export function parseTransactions(file: File): Promise<Transaction[]> {
         }
         try {
           const transactions = data.map((row, index) => {
-            const amount = Number(String(row.amount).replace(/,/g, "").trim());
+            const rawAmount = String(row.amount ?? "").replace(/,/g, "").trim();
+            const amount = Number(rawAmount);
             const date = String(row.date ?? "").trim();
             const description = String(row.description ?? "").trim();
-            if (!date || !description || !Number.isFinite(amount)) {
+            if (!isValidDate(date) || !description || !rawAmount || !Number.isFinite(amount)) {
               throw new Error(`Invalid date, description or amount on CSV row ${index + 2}`);
             }
             return {
