@@ -1,5 +1,7 @@
 # LedgerFlow — Finance Reconciliation Platform
 
+![LedgerFlow CI](https://github.com/donaldmwash/ledgerflow-finance-reconciliation/actions/workflows/ci.yml/badge.svg)
+
 LedgerFlow is a browser-based reconciliation workspace for comparing bank statement transactions with a cashbook or general-ledger export. It helps finance teams identify exact matches, investigate exceptions and produce a clear CSV reconciliation report.
 
 This portfolio project combines practical accounting workflows with a typed React application. It is a demonstration tool: it does not connect to a bank or post entries to a live accounting system.
