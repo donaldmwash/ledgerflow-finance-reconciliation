@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent } from "react";
 import { parseTransactions, sampleBankCsv, sampleLedgerCsv, toCsv } from "./lib/csv";
 import { reconcile } from "./lib/reconcile";
+import { loadWorkspace, saveWorkspace } from "./lib/workspaceStorage";
 import type { ReconciliationRow, Transaction } from "./types";
 
 const money = (value: number) => new Intl.NumberFormat("en-KE", {
@@ -24,12 +25,18 @@ const initialLedger: Transaction[] = [
 ];
 
 export default function App() {
-  const [bank, setBank] = useState(initialBank);
-  const [ledger, setLedger] = useState(initialLedger);
-  const [tolerance, setTolerance] = useState(3);
+  const [savedWorkspace] = useState(() => loadWorkspace(initialBank, initialLedger));
+  const [bank, setBank] = useState(savedWorkspace.bank);
+  const [ledger, setLedger] = useState(savedWorkspace.ledger);
+  const [tolerance, setTolerance] = useState(savedWorkspace.tolerance);
   const [filter, setFilter] = useState("all");
   const [notice, setNotice] = useState("");
-  const [manual, setManual] = useState<Record<string, boolean>>({});
+  const [manual, setManual] = useState<Record<string, boolean>>(savedWorkspace.manual);
+
+  useEffect(() => {
+    saveWorkspace({ bank, ledger, tolerance, manual });
+  }, [bank, ledger, tolerance, manual]);
+
   const result = useMemo(() => reconcile(bank, ledger, tolerance), [bank, ledger, tolerance]);
   const visibleRows = result.rows.filter((row) => filter === "all" || row.status === filter);
   const confirmedCount = result.matchedCount + Object.values(manual).filter(Boolean).length;
@@ -115,6 +122,7 @@ export default function App() {
             <option value={0}>Same day</option><option value={1}>1 day</option><option value={3}>3 days</option><option value={7}>7 days</option>
           </select>
         </div>
+        <span className="save-indicator" role="status">✓ Saved in this browser</span>
         <button className="button button-quiet" onClick={loadSample}>↻ Load sample data</button>
       </div>
 
