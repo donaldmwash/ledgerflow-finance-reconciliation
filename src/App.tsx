@@ -68,6 +68,19 @@ export default function App() {
     setNotice("Sample data loaded.");
   }
 
+  function clearWorkspace() {
+    const confirmed = window.confirm(
+      "Clear both imported files and all manual review decisions? This cannot be undone."
+    );
+    if (!confirmed) return;
+
+    setBank([]);
+    setLedger([]);
+    setManual({});
+    setFilter("all");
+    setNotice("Workspace cleared. Import new bank and ledger CSV files to begin.");
+  }
+
   function exportReport() {
     const rows = result.rows.map((row) => ({
       status: row.status,
@@ -124,6 +137,7 @@ export default function App() {
         </div>
         <span className="save-indicator" role="status">✓ Saved in this browser</span>
         <button className="button button-quiet" onClick={loadSample}>↻ Load sample data</button>
+        <button className="button button-quiet" onClick={clearWorkspace}>Clear workspace</button>
       </div>
 
       {notice && <div className="notice" role="status">{notice}<button onClick={() => setNotice("")} aria-label="Dismiss notice">×</button></div>}
