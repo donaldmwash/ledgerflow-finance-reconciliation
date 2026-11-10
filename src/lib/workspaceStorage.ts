@@ -30,10 +30,8 @@ function isTransactionList(value: unknown): value is Transaction[] {
 }
 
 function isManualReview(value: unknown): value is Record<string, boolean> {
-  return Boolean(value) &&
-    typeof value === "object" &&
-    !Array.isArray(value) &&
-    Object.values(value).every((item) => typeof item === "boolean");
+  if (!value || typeof value !== "object" || Array.isArray(value)) return false;
+  return Object.values(value).every((item) => typeof item === "boolean");
 }
 
 export function readWorkspace(
