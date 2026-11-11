@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://ledgerflow-finance-reconciliation.vercel.app/sitemap.xml
